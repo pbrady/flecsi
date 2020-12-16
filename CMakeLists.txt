@@ -33,31 +33,33 @@ set(SOURCE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI source repository")
 set(SOURCE_BRANCH "devel" CACHE STRING
   "Set the source repository branch, e.g., devel")
-set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING "Set the registry")
+set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING
+  "Set the registry")
 
 #------------------------------------------------------------------------------#
 # Images
 #------------------------------------------------------------------------------#
 
 list(APPEND BASE_IMAGES
-  centos-7.8
   centos-8
   fedora-30
-  fedora-31
   fedora-32
+  fedora-33
   ubuntu-20.04
   clearlinux
 )
 
 foreach(image ${BASE_IMAGES})
 
-  add_image(${image} ${REGISTRY}:${image} os/${image})
+  add_image(${image} ${REGISTRY}:${image} os/${image}
+    ARGS
+      IMAGE_REPO=${IMAGE_REPOSITORY}
+      IMAGE_BRANCH=${IMAGE_BRANCH}
+    )
 
   add_image(devel-${image} ${REGISTRY}:devel-${image}
     devel/ci
     ARGS
-      IMAGE_REPO=${IMAGE_REPOSITORY}
-      IMAGE_BRANCH=${IMAGE_BRANCH}
       SOURCE_REPO=${SOURCE_REPOSITORY}
       SOURCE_BRANCH=${SOURCE_BRANCH}
       SUBDIR=devel
@@ -128,12 +130,6 @@ file(COPY ${CMAKE_SOURCE_DIR}/config/clang_fortran.py
 #------------------------------------------------------------------------------#
 # Build auxiliary
 #------------------------------------------------------------------------------#
-
-if(EXISTS ${CMAKE_SOURCE_DIR}/aux/gnu-centos-7.8.xz)
-  file(COPY ${CMAKE_SOURCE_DIR}/aux/gnu-centos-7.8.xz
-    DESTINATION ${CMAKE_BINARY_DIR}
-  )
-endif()
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/aux/gnu-clearlinux.xz)
   file(COPY ${CMAKE_SOURCE_DIR}/aux/gnu-clearlinux.xz

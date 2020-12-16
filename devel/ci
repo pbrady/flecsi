@@ -6,6 +6,14 @@ ARG OS
 FROM ${OS}
 
 #------------------------------------------------------------------------------#
+# Image arguments.
+#------------------------------------------------------------------------------#
+
+ARG SOURCE_REPO
+ARG SOURCE_BRANCH
+ARG SUBDIR
+
+#------------------------------------------------------------------------------#
 # The branch for this operation should be one of the primary flecsi
 # branches, e.g., 1.4, 2.0, or devel. The 'spack-repo' subdirectory of the
 # cloned branch will be used to install upstream packages, which can be
@@ -13,40 +21,17 @@ FROM ${OS}
 # during the CI run if they are not overriden by the user's merge request.
 #------------------------------------------------------------------------------#
 
-ARG IMAGE_REPO
-ARG IMAGE_BRANCH
-ARG SOURCE_REPO
-ARG SOURCE_BRANCH
-
 RUN git clone --single-branch --branch ${SOURCE_BRANCH} ${SOURCE_REPO} .flecsi
-
-#------------------------------------------------------------------------------#
-# This clones the flecsi CI branch as specified during cmake configuration.
-# It is used to set preferred versions and compiler configuration.
-#------------------------------------------------------------------------------#
-
-RUN git clone --single-branch --branch ${IMAGE_BRANCH} ${IMAGE_REPO} .images
-
-#------------------------------------------------------------------------------#
-# Clone spack and create copy for the upstream install.
-#------------------------------------------------------------------------------#
-
-RUN git clone --single-branch \
-  --branch develop https://github.com/spack/spack.git .spack
-RUN cp -r .spack .spack-upstream
 
 #------------------------------------------------------------------------------#
 # Setup spack configuration.
 #------------------------------------------------------------------------------#
 
-ARG SUBDIR
 ADD clang_fortran.py ./.clang_fortran.py
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
-  export NCURSES_VERSION=`cat .ncurses_version` && \
   cat .images/${SUBDIR}/spack/packages.yaml | \
-    sed "s,GNU_VERSION,${GNU_VERSION},g" | \
-    sed "s,NCURSES_VERSION,${NCURSES_VERSION},g" > \
+    sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack-upstream/etc/spack/packages.yaml
 
 RUN . .spack-upstream/share/spack/setup-env.sh && \
@@ -63,10 +48,8 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
 RUN rm -rf ~/.spack/linux/compilers.yaml
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
-  export NCURSES_VERSION=`cat .ncurses_version` && \
   cat .images/${SUBDIR}/spack/packages.yaml | \
-    sed "s,GNU_VERSION,${GNU_VERSION},g" | \
-    sed "s,NCURSES_VERSION,${NCURSES_VERSION},g" > \
+    sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack/etc/spack/packages.yaml
 
 RUN cp .images/${SUBDIR}/spack/upstreams.yaml .spack/etc/spack
@@ -78,31 +61,37 @@ RUN cp .images/${SUBDIR}/spack/upstreams.yaml .spack/etc/spack
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
   && \
-  spack fetch --dependencies flecsi@devel backend=legion \
+  spack fetch --dependencies \
+    flecsi@devel backend=legion \
+    +graphviz \
     +hdf5 \
     +kokkos  \
     +debug_backend \
     ^mpich \
   && \
-  spack install --only dependencies flecsi@devel backend=legion \
+  spack install --fail-fast --show-log-on-error --only dependencies \
+    flecsi@devel backend=legion build_type=Debug \
+    +graphviz \
     +hdf5 \
     +kokkos \
-    build_type=Debug \
     +debug_backend \
     ^mpich
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
   && \
-  spack fetch --dependencies flecsi@devel backend=legion \
+  spack fetch --dependencies \
+    flecsi@devel backend=legion \
+    +graphviz \
     +hdf5 \
     +kokkos \
     ^mpich \
   && \
-  spack install --only dependencies flecsi@devel backend=legion \
+  spack install --fail-fast --show-log-on-error --only dependencies \
+    flecsi@devel backend=legion build_type=Release \
+    +graphviz \
     +hdf5 \
     +kokkos \
-    build_type=Release \
     ^mpich
 
 #------------------------------------------------------------------------------#
@@ -112,31 +101,37 @@ RUN \
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
   && \
-  spack fetch --dependencies flecsi@devel backend=legion \
+  spack fetch --dependencies \
+    flecsi@devel backend=legion \
+    +graphviz \
     +hdf5 \
     +kokkos \
     +debug_backend \
     ^openmpi \
   && \
-  spack install --only dependencies flecsi@devel backend=legion \
+  spack install --fail-fast --show-log-on-error --only dependencies \
+    flecsi@devel backend=legion build_type=Debug \
+    +graphviz \
     +hdf5 \
     +kokkos \
-    build_type=Release \
     +debug_backend \
     ^openmpi
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
   && \
-  spack fetch --dependencies flecsi@devel backend=legion \
+  spack fetch --dependencies \
+    flecsi@devel backend=legion \
+    +graphviz \
     +hdf5 \
     +kokkos \
     ^openmpi \
   && \
-  spack install --only dependencies flecsi@devel backend=legion \
+  spack install --fail-fast --show-log-on-error --only dependencies \
+    flecsi@devel backend=legion build_type=Release \
+    +graphviz \
     +hdf5 \
     +kokkos \
-    build_type=Release \
     ^openmpi
 
 #------------------------------------------------------------------------------#
@@ -159,10 +154,6 @@ RUN . .spack/share/spack/setup-env.sh && \
 #------------------------------------------------------------------------------#
 # Set default shell for interactive.
 #------------------------------------------------------------------------------#
-
-ADD --chown=flecsi:flecsi bashrc ./.bashrc
-ADD --chown=flecsi:flecsi dircolors ./.dircolors
-ADD --chown=flecsi:flecsi vimrc ./.vimrc
 
 CMD /bin/bash
 
