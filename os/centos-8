@@ -10,7 +10,7 @@ FROM centos:8
 
 RUN dnf install -y epel-release 'dnf-command(config-manager)'
 
-RUN dnf config-manager --set-enabled PowerTools
+RUN dnf config-manager --set-enabled powertools
 
 #------------------------------------------------------------------------------#
 # Install basic linux requirements
