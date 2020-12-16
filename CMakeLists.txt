@@ -25,15 +25,15 @@ project(FleCSI-CI LANGUAGES NONE)
 # Options
 #------------------------------------------------------------------------------#
 
-set(IMAGE_REPOSITORY "https://gitlab.lanl.gov/laristra/flecsi.git" CACHE STRING
+set(IMAGE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI image repository")
 set(IMAGE_BRANCH "gitlab-ci" CACHE STRING
   "Set the image repository branch, e.g., gitlab-ci")
-set(SOURCE_REPOSITORY "https://gitlab.lanl.gov/laristra/flecsi.git" CACHE STRING
+set(SOURCE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI source repository")
 set(SOURCE_BRANCH "devel" CACHE STRING
   "Set the source repository branch, e.g., devel")
-set(REGISTRY "gitlab.lanl.gov:5050/laristra/flecsi" CACHE STRING "Set the registry")
+set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING "Set the registry")
 
 #------------------------------------------------------------------------------#
 # Images
@@ -91,8 +91,8 @@ endforeach()
 add_image(tutorial ${REGISTRY}:tutorial
   devel/tutorial
   ARGS
-    OS=${REGISTRY}:devel-centos-7.8
-  DEPENDS push-devel-centos-7.8
+    OS=${REGISTRY}:devel-centos-8
+  DEPENDS push-devel-centos-8
 )
 
 #------------------------------------------------------------------------------#
