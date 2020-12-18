@@ -5,6 +5,13 @@
 FROM centos:8
 
 #------------------------------------------------------------------------------#
+# Image arguments.
+#------------------------------------------------------------------------------#
+
+ARG IMAGE_REPO
+ARG IMAGE_BRANCH
+
+#------------------------------------------------------------------------------#
 # Install and configure Extra Packages for Enterprise Linux
 #------------------------------------------------------------------------------#
 
@@ -26,7 +33,6 @@ RUN dnf update -y && dnf install -y \
   git \
   lbzip2 \
   make \
-  ncurses-devel \
   passwd \
   patch \
   python3 \
@@ -47,10 +53,9 @@ RUN echo "flecsi ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/flecsi
 USER flecsi
 WORKDIR /home/flecsi
 
-RUN \
-  echo "syntax on" > .vimrc && \
-  echo "set background=dark" >> .vimrc && \
-  echo "highlight Comment cterm=italic" >> .vimrc
+ADD --chown=flecsi:flecsi bashrc ./.bashrc
+ADD --chown=flecsi:flecsi dircolors ./.dircolors
+ADD --chown=flecsi:flecsi vimrc ./.vimrc
 
 #------------------------------------------------------------------------------#
 # Setup path for gcc 9
@@ -62,8 +67,6 @@ ENV PATH /opt/rh/gcc-toolset-9/root/usr/bin:$PATH
 # Capture version information
 #------------------------------------------------------------------------------#
 
-RUN dnf info --installed ncurses | grep -m 1 Version | \
-  awk '{ print $3 }' > .ncurses_version
 RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
 
 #------------------------------------------------------------------------------#
@@ -74,6 +77,21 @@ RUN pip3 install --user pyyaml
 RUN pip3 install --user Sphinx
 RUN pip3 install --user recommonmark
 RUN pip3 install --user sphinx_rtd_theme
+
+#------------------------------------------------------------------------------#
+# This clones the flecsi CI branch as specified during cmake configuration.
+# It is used to set preferred versions and compiler configuration.
+#------------------------------------------------------------------------------#
+
+RUN git clone --single-branch --branch ${IMAGE_BRANCH} ${IMAGE_REPO} .images
+
+#------------------------------------------------------------------------------#
+# Clone spack and create copy for the upstream install.
+#------------------------------------------------------------------------------#
+
+RUN git clone --single-branch \
+  --branch develop https://github.com/spack/spack.git .spack
+RUN cp -r .spack .spack-upstream
 
 #------------------------------------------------------------------------------#
 # Set default shell for interactive

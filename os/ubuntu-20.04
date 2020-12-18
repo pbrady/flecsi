@@ -5,6 +5,13 @@
 FROM ubuntu:20.04
 
 #------------------------------------------------------------------------------#
+# Image arguments.
+#------------------------------------------------------------------------------#
+
+ARG IMAGE_REPO
+ARG IMAGE_BRANCH
+
+#------------------------------------------------------------------------------#
 # Install basic linux requirements
 #------------------------------------------------------------------------------#
 
@@ -52,17 +59,14 @@ RUN echo "flecsi ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/flecsi
 USER flecsi
 WORKDIR /home/flecsi
 
-RUN \
-  echo "syntax on" > .vimrc && \
-  echo "set background=dark" >> .vimrc && \
-  echo "highlight Comment cterm=italic" >> .vimrc
+ADD --chown=flecsi:flecsi bashrc ./.bashrc
+ADD --chown=flecsi:flecsi dircolors ./.dircolors
+ADD --chown=flecsi:flecsi vimrc ./.vimrc
 
 #------------------------------------------------------------------------------#
 # Capture version information
 #------------------------------------------------------------------------------#
 
-RUN apt-cache policy libncurses-dev | grep Installed | \
-  awk '{ print $2 }' | sed 's,\-.*,,g' > .ncurses_version
 RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
 
 #------------------------------------------------------------------------------#
@@ -73,6 +77,21 @@ RUN pip3 install --user pyyaml
 RUN pip3 install --user Sphinx
 RUN pip3 install --user recommonmark
 RUN pip3 install --user sphinx_rtd_theme
+
+#------------------------------------------------------------------------------#
+# This clones the flecsi CI branch as specified during cmake configuration.
+# It is used to set preferred versions and compiler configuration.
+#------------------------------------------------------------------------------#
+
+RUN git clone --single-branch --branch ${IMAGE_BRANCH} ${IMAGE_REPO} .images
+
+#------------------------------------------------------------------------------#
+# Clone spack and create copy for the upstream install.
+#------------------------------------------------------------------------------#
+
+RUN git clone --single-branch \
+  --branch develop https://github.com/spack/spack.git .spack
+RUN cp -r .spack .spack-upstream
 
 #------------------------------------------------------------------------------#
 # Set default shell for interactive
