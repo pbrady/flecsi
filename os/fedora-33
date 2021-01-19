@@ -10,6 +10,8 @@ FROM fedora:33
 
 ARG IMAGE_REPO
 ARG IMAGE_BRANCH
+ARG SPACK_REPO
+ARG SPACK_BRANCH
 
 #------------------------------------------------------------------------------#
 # Install basic linux requirements
@@ -29,6 +31,7 @@ RUN dnf update -y && dnf install -y \
   gcc-c++ \
   gcc-gfortran \
   git \
+  graphviz-devel \
   lbzip2 \
   make \
   passwd \
@@ -62,6 +65,7 @@ ADD --chown=flecsi:flecsi vimrc ./.vimrc
 #------------------------------------------------------------------------------#
 
 RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
+RUN dot -V 2>&1 | awk '{print $5}' > .graphviz_version
 
 #------------------------------------------------------------------------------#
 # Install pip packages
@@ -77,14 +81,18 @@ RUN pip3 install --user sphinx_rtd_theme
 # It is used to set preferred versions and compiler configuration.
 #------------------------------------------------------------------------------#
 
+ARG EMPH="\e[38;5;36m"
+ARG NEMPH="\e[0m"
+
+RUN echo -e "${EMPH}Cloning images: ${IMAGE_BRANCH} from ${IMAGE_REPO}${NEMPH}"
 RUN git clone --single-branch --branch ${IMAGE_BRANCH} ${IMAGE_REPO} .images
 
 #------------------------------------------------------------------------------#
 # Clone spack and create copy for the upstream install.
 #------------------------------------------------------------------------------#
 
-RUN git clone --single-branch \
-  --branch develop https://github.com/spack/spack.git .spack
+RUN echo -e "${EMPH}Cloning spack: ${SPACK_BRANCH} from ${SPACK_REPO}${NEMPH}"
+RUN git clone --single-branch --branch ${SPACK_BRANCH} ${SPACK_REPO} .spack
 RUN cp -r .spack .spack-upstream
 
 #------------------------------------------------------------------------------#

@@ -5,8 +5,3 @@ packages:
     target: [skylake]
   cmake:
     version: [3.18.4]
-  ncurses:
-    buildable: False
-    externals:
-    - spec: ncurses@NCURSES_VERSION
-      prefix: /usr
