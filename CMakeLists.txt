@@ -27,12 +27,17 @@ project(FleCSI-CI LANGUAGES NONE)
 
 set(IMAGE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI image repository")
-set(IMAGE_BRANCH "gitlab-ci" CACHE STRING
-  "Set the image repository branch, e.g., gitlab-ci")
+set(IMAGE_BRANCH "images" CACHE STRING "Set the FleCSI image repository branch")
+
+set(SPACK_REPOSITORY "https://github.com/spack/spack.git" CACHE STRING
+  "Set the Spack repository")
+set(SPACK_BRANCH "develop" CACHE STRING "Set the Spack branch")
+
 set(SOURCE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI source repository")
 set(SOURCE_BRANCH "devel" CACHE STRING
-  "Set the source repository branch, e.g., devel")
+  "Set the source repository branch")
+
 set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING
   "Set the registry")
 
@@ -55,10 +60,11 @@ foreach(image ${BASE_IMAGES})
     ARGS
       IMAGE_REPO=${IMAGE_REPOSITORY}
       IMAGE_BRANCH=${IMAGE_BRANCH}
+      SPACK_REPO=${SPACK_REPOSITORY}
+      SPACK_BRANCH=${SPACK_BRANCH}
     )
 
-  add_image(devel-${image} ${REGISTRY}:devel-${image}
-    devel/ci
+  add_image(devel-${image} ${REGISTRY}:devel-${image} devel/ci
     ARGS
       SOURCE_REPO=${SOURCE_REPOSITORY}
       SOURCE_BRANCH=${SOURCE_BRANCH}
@@ -67,18 +73,18 @@ foreach(image ${BASE_IMAGES})
     DEPENDS push-${image}
   )
 
-  add_image(util-${image} ${REGISTRY}:util-${image}
-    util/ci
+  add_image(util-${image} ${REGISTRY}:util-${image} util/ci
     ARGS
       IMAGE_REPO=${IMAGE_REPOSITORY}
       IMAGE_BRANCH=${IMAGE_BRANCH}
+      SPACK_REPO=${SPACK_REPOSITORY}
+      SPACK_BRANCH=${SPACK_BRANCH}
       SUBDIR=util
       OS=${REGISTRY}:${image}
     DEPENDS push-${image}
   )
 
-  add_image(flecsi-${image} ${REGISTRY}:flecsi-${image}
-    devel/flecsi
+  add_image(flecsi-${image} ${REGISTRY}:flecsi-${image} devel/flecsi
     ARGS
       OS=${REGISTRY}:devel-${image}
     DEPENDS push-devel-${image}
@@ -93,8 +99,8 @@ endforeach()
 add_image(tutorial ${REGISTRY}:tutorial
   devel/tutorial
   ARGS
-    OS=${REGISTRY}:devel-centos-8
-  DEPENDS push-devel-centos-8
+  OS=${REGISTRY}:devel-clearlinux
+  DEPENDS push-devel-clearlinux
 )
 
 #------------------------------------------------------------------------------#
@@ -106,49 +112,4 @@ add_image(legion-unit ${REGISTRY}:legion-unit
   ARGS
     OS=${REGISTRY}:devel-ubuntu-20.04
   DEPENDS push-devel-ubuntu-20.04
-)
-
-#------------------------------------------------------------------------------#
-# Add .dockerignore file to avoid including cmake files in context
-#------------------------------------------------------------------------------#
-
-configure_file(${CMAKE_SOURCE_DIR}/config/dockerignore
-  ${CMAKE_BINARY_DIR}/.dockerignore)
-
-file(COPY ${CMAKE_SOURCE_DIR}/config/clang_fortran.py
-  DESTINATION ${CMAKE_BINARY_DIR}
-  FILE_PERMISSIONS
-    OWNER_READ
-    OWNER_WRITE
-    OWNER_EXECUTE
-    GROUP_READ
-    GROUP_EXECUTE
-    WORLD_READ
-    WORLD_EXECUTE
-)
-
-#------------------------------------------------------------------------------#
-# Build auxiliary
-#------------------------------------------------------------------------------#
-
-if(EXISTS ${CMAKE_SOURCE_DIR}/aux/gnu-clearlinux.xz)
-  file(COPY ${CMAKE_SOURCE_DIR}/aux/gnu-clearlinux.xz
-    DESTINATION ${CMAKE_BINARY_DIR}
-  )
-endif()
-
-#------------------------------------------------------------------------------#
-# Environment files
-#------------------------------------------------------------------------------#
-
-file(COPY ${CMAKE_SOURCE_DIR}/config/dircolors
-  DESTINATION ${CMAKE_BINARY_DIR}
-)
-
-file(COPY ${CMAKE_SOURCE_DIR}/config/bashrc
-  DESTINATION ${CMAKE_BINARY_DIR}
-)
-
-file(COPY ${CMAKE_SOURCE_DIR}/config/vimrc
-  DESTINATION ${CMAKE_BINARY_DIR}
 )

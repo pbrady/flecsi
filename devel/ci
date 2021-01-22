@@ -12,6 +12,8 @@ FROM ${OS}
 ARG SOURCE_REPO
 ARG SOURCE_BRANCH
 ARG SUBDIR
+ARG EMPH="\e[38;5;36m"
+ARG NEMPH="\e[0m"
 
 #------------------------------------------------------------------------------#
 # The branch for this operation should be one of the primary flecsi
@@ -21,6 +23,8 @@ ARG SUBDIR
 # during the CI run if they are not overriden by the user's merge request.
 #------------------------------------------------------------------------------#
 
+RUN \
+  echo -e "${EMPH}Cloning flecsi: ${SOURCE_BRANCH} from ${SOURCE_REPO}${NEMPH}"
 RUN git clone --single-branch --branch ${SOURCE_BRANCH} ${SOURCE_REPO} .flecsi
 
 #------------------------------------------------------------------------------#
@@ -30,8 +34,10 @@ RUN git clone --single-branch --branch ${SOURCE_BRANCH} ${SOURCE_REPO} .flecsi
 ADD clang_fortran.py ./.clang_fortran.py
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
+  export GRAPHVIZ_VERSION=`cat .graphviz_version` && \
   cat .images/${SUBDIR}/spack/packages.yaml | \
-    sed "s,GNU_VERSION,${GNU_VERSION},g" > \
+    sed "s,GNU_VERSION,${GNU_VERSION},g" | \
+    sed "s,GRAPHVIZ_VERSION,${GRAPHVIZ_VERSION},g" > \
     .spack-upstream/etc/spack/packages.yaml
 
 RUN . .spack-upstream/share/spack/setup-env.sh && \
@@ -48,9 +54,12 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
 RUN rm -rf ~/.spack/linux/compilers.yaml
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
+  export GRAPHVIZ_VERSION=`cat .graphviz_version` && \
   cat .images/${SUBDIR}/spack/packages.yaml | \
-    sed "s,GNU_VERSION,${GNU_VERSION},g" > \
+    sed "s,GNU_VERSION,${GNU_VERSION},g" | \
+    sed "s,GRAPHVIZ_VERSION,${GRAPHVIZ_VERSION},g" > \
     .spack/etc/spack/packages.yaml
+
 
 RUN cp .images/${SUBDIR}/spack/upstreams.yaml .spack/etc/spack
 
@@ -58,37 +67,37 @@ RUN cp .images/${SUBDIR}/spack/upstreams.yaml .spack/etc/spack
 # Build flecsi dependencies with mpich provider.
 #------------------------------------------------------------------------------#
 
-RUN \
-  . .spack-upstream/share/spack/setup-env.sh \
-  && \
-  spack fetch --dependencies \
-    flecsi@devel backend=legion \
-    +graphviz \
-    +hdf5 \
-    +kokkos  \
-    +debug_backend \
-    ^mpich \
-  && \
-  spack install --fail-fast --show-log-on-error --only dependencies \
-    flecsi@devel backend=legion build_type=Debug \
-    +graphviz \
-    +hdf5 \
-    +kokkos \
-    +debug_backend \
-    ^mpich
+#RUN \
+#  . .spack-upstream/share/spack/setup-env.sh \
+#  && \
+#  spack fetch --dependencies \
+#    flecsi@devel backend=legion \
+#    +graphviz \
+#    +hdf5 \
+#    +kokkos  \
+#    ^legion build_type=Debug \
+#    ^mpich \
+#  && \
+#  spack install --fail-fast --show-log-on-error --only dependencies \
+#    flecsi@devel backend=legion build_type=Debug \
+#    +graphviz \
+#    +hdf5 \
+#    +kokkos \
+#    ^legion build_type=Debug \
+#    ^mpich
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
   && \
   spack fetch --dependencies \
-    flecsi@devel backend=legion \
+    flecsi@devel backend=legion caliper_detail=low \
     +graphviz \
     +hdf5 \
     +kokkos \
     ^mpich \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
-    flecsi@devel backend=legion build_type=Release \
+    flecsi@devel backend=legion caliper_detail=low build_type=Release \
     +graphviz \
     +hdf5 \
     +kokkos \
@@ -98,37 +107,37 @@ RUN \
 # Build flecsi dependencies with openmpi provider.
 #------------------------------------------------------------------------------#
 
-RUN \
-  . .spack-upstream/share/spack/setup-env.sh \
-  && \
-  spack fetch --dependencies \
-    flecsi@devel backend=legion \
-    +graphviz \
-    +hdf5 \
-    +kokkos \
-    +debug_backend \
-    ^openmpi \
-  && \
-  spack install --fail-fast --show-log-on-error --only dependencies \
-    flecsi@devel backend=legion build_type=Debug \
-    +graphviz \
-    +hdf5 \
-    +kokkos \
-    +debug_backend \
-    ^openmpi
+#RUN \
+#  . .spack-upstream/share/spack/setup-env.sh \
+#  && \
+#  spack fetch --dependencies \
+#    flecsi@devel backend=legion \
+#    +graphviz \
+#    +hdf5 \
+#    +kokkos \
+#    ^legion build_type=Debug \
+#    ^openmpi \
+#  && \
+#  spack install --fail-fast --show-log-on-error --only dependencies \
+#    flecsi@devel backend=legion build_type=Debug \
+#    +graphviz \
+#    +hdf5 \
+#    +kokkos \
+#    ^legion build_type=Debug \
+#    ^openmpi
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
   && \
   spack fetch --dependencies \
-    flecsi@devel backend=legion \
+    flecsi@devel backend=legion caliper_detail=low \
     +graphviz \
     +hdf5 \
     +kokkos \
     ^openmpi \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
-    flecsi@devel backend=legion build_type=Release \
+    flecsi@devel backend=legion caliper_detail=low build_type=Release \
     +graphviz \
     +hdf5 \
     +kokkos \
