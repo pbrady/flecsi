@@ -12,10 +12,7 @@ packages:
     version: [2020.3.0]
     variants: ~aligned-segments~ibv+mpi~pshm~udp segment-mmap-max=16GB
   graphviz:
-    buildable: False
-    externals:
-      - spec: graphviz@GRAPHVIZ_VERSION
-        prefix: /usr
+    version: [2.46.0]
   hdf5:
     version: [1.10.7]
   kokkos:
