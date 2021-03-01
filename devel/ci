@@ -34,10 +34,8 @@ RUN git clone --single-branch --branch ${SOURCE_BRANCH} ${SOURCE_REPO} .flecsi
 ADD clang_fortran.py ./.clang_fortran.py
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
-  export GRAPHVIZ_VERSION=`cat .graphviz_version` && \
   cat .images/${SUBDIR}/spack/packages.yaml | \
-    sed "s,GNU_VERSION,${GNU_VERSION},g" | \
-    sed "s,GRAPHVIZ_VERSION,${GRAPHVIZ_VERSION},g" > \
+    sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack-upstream/etc/spack/packages.yaml
 
 RUN . .spack-upstream/share/spack/setup-env.sh && \
@@ -54,10 +52,7 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
 RUN rm -rf ~/.spack/linux/compilers.yaml
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
-  export GRAPHVIZ_VERSION=`cat .graphviz_version` && \
-  cat .images/${SUBDIR}/spack/packages.yaml | \
-    sed "s,GNU_VERSION,${GNU_VERSION},g" | \
-    sed "s,GRAPHVIZ_VERSION,${GRAPHVIZ_VERSION},g" > \
+    sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack/etc/spack/packages.yaml
 
 
@@ -66,25 +61,6 @@ RUN cp .images/${SUBDIR}/spack/upstreams.yaml .spack/etc/spack
 #------------------------------------------------------------------------------#
 # Build flecsi dependencies with mpich provider.
 #------------------------------------------------------------------------------#
-
-#RUN \
-#  . .spack-upstream/share/spack/setup-env.sh \
-#  && \
-#  spack fetch --dependencies \
-#    flecsi@devel backend=legion \
-#    +graphviz \
-#    +hdf5 \
-#    +kokkos  \
-#    ^legion build_type=Debug \
-#    ^mpich \
-#  && \
-#  spack install --fail-fast --show-log-on-error --only dependencies \
-#    flecsi@devel backend=legion build_type=Debug \
-#    +graphviz \
-#    +hdf5 \
-#    +kokkos \
-#    ^legion build_type=Debug \
-#    ^mpich
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
@@ -106,25 +82,6 @@ RUN \
 #------------------------------------------------------------------------------#
 # Build flecsi dependencies with openmpi provider.
 #------------------------------------------------------------------------------#
-
-#RUN \
-#  . .spack-upstream/share/spack/setup-env.sh \
-#  && \
-#  spack fetch --dependencies \
-#    flecsi@devel backend=legion \
-#    +graphviz \
-#    +hdf5 \
-#    +kokkos \
-#    ^legion build_type=Debug \
-#    ^openmpi \
-#  && \
-#  spack install --fail-fast --show-log-on-error --only dependencies \
-#    flecsi@devel backend=legion build_type=Debug \
-#    +graphviz \
-#    +hdf5 \
-#    +kokkos \
-#    ^legion build_type=Debug \
-#    ^openmpi
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \

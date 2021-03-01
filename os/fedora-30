@@ -65,7 +65,6 @@ ADD --chown=flecsi:flecsi vimrc ./.vimrc
 #------------------------------------------------------------------------------#
 
 RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
-RUN dot -V 2>&1 | awk '{print $5}' > .graphviz_version
 
 #------------------------------------------------------------------------------#
 # Install pip packages

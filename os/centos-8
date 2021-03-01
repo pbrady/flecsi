@@ -33,7 +33,6 @@ RUN dnf update -y && dnf install -y \
   flex \
   gcc-toolset-9 \
   git \
-  graphviz-devel \
   lbzip2 \
   make \
   passwd \
@@ -71,7 +70,6 @@ ENV PATH /opt/rh/gcc-toolset-9/root/usr/bin:$PATH
 #------------------------------------------------------------------------------#
 
 RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
-RUN dot -V 2>&1 | awk '{print $5}' > .graphviz_version
 
 #------------------------------------------------------------------------------#
 # Install pip packages
