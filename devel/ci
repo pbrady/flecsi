@@ -52,6 +52,7 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
 RUN rm -rf ~/.spack/linux/compilers.yaml
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
+  cat .images/${SUBDIR}/spack/packages.yaml | \
     sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack/etc/spack/packages.yaml
 
