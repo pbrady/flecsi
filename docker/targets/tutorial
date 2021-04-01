@@ -1,0 +1,62 @@
+#------------------------------------------------------------------------------#
+# FleCSI Tutorial Image
+#------------------------------------------------------------------------------#
+
+ARG OS
+FROM ${OS}
+
+#------------------------------------------------------------------------------#
+# Image arguments.
+#------------------------------------------------------------------------------#
+
+ARG SOURCE_VERSION
+
+#------------------------------------------------------------------------------#
+# Add spack repo.
+#------------------------------------------------------------------------------#
+
+RUN . /home/flecsi/.spack/share/spack/setup-env.sh && \
+  spack repo add .flecsi/spack-repo
+
+#------------------------------------------------------------------------------#
+# Install flecsi in the 'tutorial' environment.
+#------------------------------------------------------------------------------#
+
+RUN . /home/flecsi/.spack/share/spack/setup-env.sh && \
+  spack env create tutorial && \
+  spack env activate tutorial && \
+  spack install flecsi@${SOURCE_VERSION} \
+    backend=legion caliper_detail=low build_type=Debug \
+    +flog \
+    +graphviz \
+    +hdf5 \
+    +kokkos \
+    ^mpich && \
+  spack install cmake
+
+#------------------------------------------------------------------------------#
+# Copy the tutorial into the top-level directory.
+#------------------------------------------------------------------------------#
+
+RUN cp -r .flecsi/tutorial .
+
+#------------------------------------------------------------------------------#
+# Build the tuturial examples.
+#------------------------------------------------------------------------------#
+
+RUN mkdir -p tutorial/build
+
+WORKDIR tutorial/build
+RUN . /home/flecsi/.spack/share/spack/setup-env.sh && \
+  spack env activate tutorial && \
+  cmake .. && \
+  make -j 4
+
+#------------------------------------------------------------------------------#
+# Set default work directory and shell for interactive.
+#------------------------------------------------------------------------------#
+
+WORKDIR /home/flecsi
+CMD /bin/bash
+
+# vim: syntax=dockerfile

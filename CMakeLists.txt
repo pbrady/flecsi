@@ -58,7 +58,9 @@ list(APPEND BASE_IMAGES
 
 foreach(image ${BASE_IMAGES})
 
-  add_image(${image} ${REGISTRY}:${image} os/${image}
+  add_image(${image}
+    ${REGISTRY}:${image}
+    docker/os/${image}
     ARGS
       IMAGE_REPO=${IMAGE_REPOSITORY}
       IMAGE_BRANCH=${IMAGE_BRANCH}
@@ -68,29 +70,34 @@ foreach(image ${BASE_IMAGES})
 
   add_image(${SOURCE_BRANCH}-${image}
     ${REGISTRY}:${SOURCE_BRANCH}-${image}
-    ${SOURCE_BRANCH}/ci
+    docker/targets/ci
     ARGS
       SOURCE_REPO=${SOURCE_REPOSITORY}
       SOURCE_BRANCH=${SOURCE_BRANCH}
       SOURCE_VERSION=${SOURCE_VERSION}
-      SUBDIR=${SOURCE_BRANCH}
+      IMAGE_BRANCH=${SOURCE_BRANCH}
       OS=${REGISTRY}:${image}
     DEPENDS push-${image}
   )
 
-  add_image(util-${image} ${REGISTRY}:util-${image} util/ci
+  add_image(util-${image}
+    ${REGISTRY}:util-${image}
+    docker/util/ci
     ARGS
       IMAGE_REPO=${IMAGE_REPOSITORY}
       IMAGE_BRANCH=${IMAGE_BRANCH}
       SPACK_REPO=${SPACK_REPOSITORY}
       SPACK_BRANCH=${SPACK_BRANCH}
-      SUBDIR=util
+      IMAGE_BRANCH=util
       OS=${REGISTRY}:${image}
     DEPENDS push-${image}
   )
 
-  add_image(flecsi-${image} ${REGISTRY}:flecsi-${image} 2.0/flecsi
+  add_image(flecsi-${image}
+    ${REGISTRY}:flecsi-${image}
+    docker/targets/flecsi
     ARGS
+      SOURCE_VERSION=2.0.0
       OS=${REGISTRY}:2.0-${image}
     DEPENDS push-2.0-${image}
   )
