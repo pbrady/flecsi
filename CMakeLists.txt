@@ -37,6 +37,8 @@ set(SOURCE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI source repository")
 set(SOURCE_BRANCH "devel" CACHE STRING
   "Set the source repository branch")
+set(SOURCE_VERSION "devel" CACHE STRING
+  "Set the source repository version")
 
 set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING
   "Set the registry")
@@ -64,11 +66,14 @@ foreach(image ${BASE_IMAGES})
       SPACK_BRANCH=${SPACK_BRANCH}
     )
 
-  add_image(devel-${image} ${REGISTRY}:devel-${image} devel/ci
+  add_image(${SOURCE_BRANCH}-${image}
+    ${REGISTRY}:${SOURCE_BRANCH}-${image}
+    ${SOURCE_BRANCH}/ci
     ARGS
       SOURCE_REPO=${SOURCE_REPOSITORY}
       SOURCE_BRANCH=${SOURCE_BRANCH}
-      SUBDIR=devel
+      SOURCE_VERSION=${SOURCE_VERSION}
+      SUBDIR=${SOURCE_BRANCH}
       OS=${REGISTRY}:${image}
     DEPENDS push-${image}
   )
@@ -84,10 +89,10 @@ foreach(image ${BASE_IMAGES})
     DEPENDS push-${image}
   )
 
-  add_image(flecsi-${image} ${REGISTRY}:flecsi-${image} devel/flecsi
+  add_image(flecsi-${image} ${REGISTRY}:flecsi-${image} 2.0/flecsi
     ARGS
-      OS=${REGISTRY}:devel-${image}
-    DEPENDS push-devel-${image}
+      OS=${REGISTRY}:2.0-${image}
+    DEPENDS push-2.0-${image}
   )
 
 endforeach()
@@ -97,10 +102,10 @@ endforeach()
 #------------------------------------------------------------------------------#
 
 add_image(tutorial ${REGISTRY}:tutorial
-  devel/tutorial
+  2.0/tutorial
   ARGS
-  OS=${REGISTRY}:devel-clearlinux
-  DEPENDS push-devel-clearlinux
+  OS=${REGISTRY}:2.0-clearlinux
+  DEPENDS push-2.0-clearlinux
 )
 
 #------------------------------------------------------------------------------#
@@ -113,3 +118,20 @@ add_image(legion-unit ${REGISTRY}:legion-unit
     OS=${REGISTRY}:devel-ubuntu-20.04
   DEPENDS push-devel-ubuntu-20.04
 )
+
+#------------------------------------------------------------------------------#
+# Summary
+#------------------------------------------------------------------------------#
+
+include(summary)
+
+summary_header()
+summary_info("IMAGE_REPOSITORY" "${IMAGE_REPOSITORY}" TRUE)
+summary_info("IMAGE_BRANCH" "${IMAGE_BRANCH}" TRUE)
+summary_info("SPACK_REPOSITORY" "${SPACK_REPOSITORY}" TRUE)
+summary_info("SPACK_BRANCH" "${SPACK_BRANCH}" TRUE)
+summary_info("SOURCE_REPOSITORY" "${SOURCE_REPOSITORY}" TRUE)
+summary_info("SOURCE_BRANCH" "${SOURCE_BRANCH}" TRUE)
+summary_info("SOURCE_VERSION" "${SOURCE_VERSION}" TRUE)
+
+message(STATUS ${_summary})
