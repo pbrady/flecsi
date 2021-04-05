@@ -9,11 +9,11 @@ FROM ${OS}
 # Setup spack configuration
 #------------------------------------------------------------------------------#
 
-ARG SUBDIR
+ARG IMAGE_BRANCH
 
 RUN mkdir -p .spack/linux && \
   export GNU_VERSION=`cat .gnu_version` && \
-    cat .images/${SUBDIR}/spack/packages.yaml | \
+    cat .images/branches/${IMAGE_BRANCH}/spack/packages.yaml | \
     sed "s,GNU_VERSION,${GNU_VERSION},g" > .spack/linux/packages.yaml
 
 RUN . .spack/share/spack/setup-env.sh && \
