@@ -12,7 +12,6 @@ FROM ${OS}
 ARG SOURCE_REPO
 ARG SOURCE_BRANCH
 ARG SOURCE_VERSION
-ARG IMAGE_BRANCH
 ARG EMPH="\e[38;5;36m"
 ARG NEMPH="\e[0m"
 
@@ -33,9 +32,10 @@ RUN git clone --single-branch --branch ${SOURCE_BRANCH} ${SOURCE_REPO} .flecsi
 #------------------------------------------------------------------------------#
 
 ADD clang_fortran.py ./.clang_fortran.py
+ADD spack ./.spack-aux
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
-  cat .images/branches/${IMAGE_BRANCH}/spack/packages.yaml | \
+  cat .spack-aux/packages.yaml | \
     sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack-upstream/etc/spack/packages.yaml
 
@@ -53,16 +53,18 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
 RUN rm -rf ~/.spack/linux/compilers.yaml
 
 RUN export GNU_VERSION=`cat .gnu_version` && \
-  cat .images/branches/${IMAGE_BRANCH}/spack/packages.yaml | \
+  cat .spack-aux/packages.yaml | \
     sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack/etc/spack/packages.yaml
 
 
-RUN cp .images/branches/${IMAGE_BRANCH}/spack/upstreams.yaml .spack/etc/spack
+RUN cp .spack-aux/upstreams.yaml .spack/etc/spack
 
 #------------------------------------------------------------------------------#
 # Build flecsi dependencies with mpich provider.
 #------------------------------------------------------------------------------#
+
+RUN echo -e "${EMPH}Building mpich dependencies for flecsi@${SOURCE_VERSION}${NEMPH}"
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
@@ -85,6 +87,8 @@ RUN \
 #------------------------------------------------------------------------------#
 # Build flecsi dependencies with openmpi provider.
 #------------------------------------------------------------------------------#
+
+RUN echo -e "${EMPH}Building openmpi dependencies for flecsi@${SOURCE_VERSION}${NEMPH}"
 
 RUN \
   . .spack-upstream/share/spack/setup-env.sh \
