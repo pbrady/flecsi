@@ -16,7 +16,7 @@ function(add_image target tag dockerfile)
 
   set(options)
   set(one_value_args)
-  set(multi_value_args ARGS DEPENDS)
+  set(multi_value_args TARGET_BRANCH ARGS DEPENDS)
 
   cmake_parse_arguments(image "${options}" "${one_value_args}"
     "${multi_value_args}" ${ARGN})
@@ -31,7 +31,7 @@ function(add_image target tag dockerfile)
   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/targets/${target})
 
   configure_file(${CMAKE_SOURCE_DIR}/config/dockerignore
-  ${CMAKE_BINARY_DIR}/targets/${target}/.dockerignore)
+    ${CMAKE_BINARY_DIR}/targets/${target}/.dockerignore)
 
   if(EXISTS ${CMAKE_SOURCE_DIR}/aux/gnu-${target}.xz)
     file(COPY ${CMAKE_SOURCE_DIR}/aux/gnu-${target}.xz
@@ -62,6 +62,17 @@ function(add_image target tag dockerfile)
   file(COPY ${CMAKE_SOURCE_DIR}/config/vimrc
     DESTINATION ${CMAKE_BINARY_DIR}/targets/${target}
   )
+
+  if(image_TARGET_BRANCH)
+    if(NOT EXISTS ${CMAKE_SOURCE_DIR}/branches/${image_TARGET_BRANCH}/spack)
+      message(FATAL_ERROR "Branch spack directory "
+        "${CMAKE_SOURCE_DIR}/branches/${image_TARGET_BRANCH}/spack "
+        "does not exist")
+    endif()
+
+    file(COPY ${CMAKE_SOURCE_DIR}/branches/${image_TARGET_BRANCH}/spack
+      DESTINATION ${CMAKE_BINARY_DIR}/targets/${target})
+  endif()
 
   add_custom_target(${target} ALL
     ${ENGINE_EXECUTABLE} build \${BUILD_EXTRA} ${args} -t ${tag}

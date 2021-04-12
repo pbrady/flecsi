@@ -81,19 +81,11 @@ RUN pip3 install --user recommonmark
 RUN pip3 install --user sphinx_rtd_theme
 
 #------------------------------------------------------------------------------#
-# This clones the flecsi CI branch as specified during cmake configuration.
-# It is used to set preferred versions and compiler configuration.
+# Clone spack and create copy for the upstream install.
 #------------------------------------------------------------------------------#
 
 ARG EMPH="\e[38;5;36m"
 ARG NEMPH="\e[0m"
-
-RUN echo -e "${EMPH}Cloning images: ${IMAGE_BRANCH} from ${IMAGE_REPO}${NEMPH}"
-RUN git clone --single-branch --branch ${IMAGE_BRANCH} ${IMAGE_REPO} .images
-
-#------------------------------------------------------------------------------#
-# Clone spack and create copy for the upstream install.
-#------------------------------------------------------------------------------#
 
 RUN echo -e "${EMPH}Cloning spack: ${SPACK_BRANCH} from ${SPACK_REPO}${NEMPH}"
 RUN git clone --single-branch --branch ${SPACK_BRANCH} ${SPACK_REPO} .spack
