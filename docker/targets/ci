@@ -57,7 +57,6 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
     sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack/etc/spack/packages.yaml
 
-
 RUN cp .spack-aux/upstreams.yaml .spack/etc/spack
 
 #------------------------------------------------------------------------------#
