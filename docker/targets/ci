@@ -117,12 +117,11 @@ RUN . .spack-upstream/share/spack/setup-env.sh && \
   spack install cmake
 
 #------------------------------------------------------------------------------#
-# Remove the lanl_ristra_flecsi repository so that the MR can override
-# our defaults.
+# Remove the flecsi repository so that the MR can override our defaults.
 #------------------------------------------------------------------------------#
 
 RUN . .spack/share/spack/setup-env.sh && \
-  spack repo remove lanl_ristra_flecsi
+  spack repo remove flecsi
 
 #------------------------------------------------------------------------------#
 # Set default shell for interactive.
