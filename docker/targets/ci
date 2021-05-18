@@ -77,10 +77,19 @@ RUN \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
     flecsi@${SOURCE_VERSION} \
-    backend=legion caliper_detail=low build_type=Release \
+    backend=legion caliper_detail=low \
     +graphviz \
     +hdf5 \
     +kokkos \
+    ^mpich \
+  && \
+  spack install --fail-fast --show-log-on-error --only dependencies \
+    flecsi@${SOURCE_VERSION} \
+    backend=legion caliper_detail=low \
+    +graphviz \
+    +hdf5 \
+    +kokkos \
+    ^legion build_type=Debug \
     ^mpich
 
 #------------------------------------------------------------------------------#
@@ -101,10 +110,19 @@ RUN \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
     flecsi@${SOURCE_VERSION} \
-    backend=legion caliper_detail=low build_type=Release \
+    backend=legion caliper_detail=low \
     +graphviz \
     +hdf5 \
     +kokkos \
+    ^openmpi \
+  && \
+  spack install --fail-fast --show-log-on-error --only dependencies \
+    flecsi@${SOURCE_VERSION} \
+    backend=legion caliper_detail=low \
+    +graphviz \
+    +hdf5 \
+    +kokkos \
+    ^legion build_type=Debug \
     ^openmpi
 
 #------------------------------------------------------------------------------#
@@ -117,12 +135,11 @@ RUN . .spack-upstream/share/spack/setup-env.sh && \
   spack install cmake
 
 #------------------------------------------------------------------------------#
-# Remove the lanl_ristra_flecsi repository so that the MR can override
-# our defaults.
+# Remove the flecsi repository so that the MR can override our defaults.
 #------------------------------------------------------------------------------#
 
 RUN . .spack/share/spack/setup-env.sh && \
-  spack repo remove lanl_ristra_flecsi
+  spack repo remove flecsi
 
 #------------------------------------------------------------------------------#
 # Set default shell for interactive.

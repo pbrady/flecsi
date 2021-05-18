@@ -4,10 +4,10 @@ packages:
       - gcc@GNU_VERSION
     target: [skylake]
   boost:
-    version: [1.74.0]
+    version: [1.76.0]
     variants: cxxstd=17 +program_options
   cmake:
-    version: [3.18.4]
+    version: [3.20.1]
   gasnet:
     version: [2020.3.0]
     variants: ~aligned-segments~ibv+mpi~pshm~udp segment-mmap-max=16GB
@@ -16,7 +16,7 @@ packages:
   hdf5:
     version: [1.10.7]
   kokkos:
-    version: [3.2.00]
+    version: [3.3.01]
   metis:
     version: [5.1.0]
   mpich:
