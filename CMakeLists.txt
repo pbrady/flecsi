@@ -49,9 +49,11 @@ set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING
 
 list(APPEND BASE_IMAGES
   centos-8
+  rockylinux
   fedora-30
   fedora-32
   fedora-33
+  fedora-34
   ubuntu-20.04
   clearlinux
 )

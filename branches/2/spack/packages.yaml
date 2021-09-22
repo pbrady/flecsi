@@ -8,9 +8,6 @@ packages:
     variants: cxxstd=17 +program_options
   cmake:
     version: [3.20.1]
-  gasnet:
-    version: [2020.3.0]
-    variants: ~aligned-segments~ibv+mpi~pshm~udp segment-mmap-max=16GB
   graphviz:
     version: [2.46.0]
   hdf5:

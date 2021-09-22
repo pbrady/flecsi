@@ -47,6 +47,8 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
   /home/flecsi/.clang_fortran.py '.spack/linux/compilers.yaml' \
     '.spack-upstream/etc/spack/compilers.yaml' "${GNU_VERSION}"
 
+RUN cp .spack-aux/config.yaml .spack-upstream/etc/spack
+
 RUN export GNU_VERSION=`cat .gnu_version` && \
   /home/flecsi/.clang_fortran.py '.spack/linux/compilers.yaml' \
     '.spack/etc/spack/compilers.yaml' "${GNU_VERSION}"
@@ -56,6 +58,8 @@ RUN export GNU_VERSION=`cat .gnu_version` && \
   cat .spack-aux/packages.yaml | \
     sed "s,GNU_VERSION,${GNU_VERSION},g" > \
     .spack/etc/spack/packages.yaml
+
+RUN cp .spack-aux/config.yaml .spack/etc/spack
 
 RUN cp .spack-aux/upstreams.yaml .spack/etc/spack
 
@@ -81,6 +85,7 @@ RUN \
     +graphviz \
     +hdf5 \
     +kokkos \
+    ^legion network=gasnet conduit=mpi +hdf5 +kokkos \
     ^mpich \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
@@ -89,7 +94,7 @@ RUN \
     +graphviz \
     +hdf5 \
     +kokkos \
-    ^legion build_type=Debug \
+    ^legion build_type=Debug network=gasnet conduit=mpi +hdf5 +kokkos \
     ^mpich
 
 #------------------------------------------------------------------------------#
@@ -114,6 +119,7 @@ RUN \
     +graphviz \
     +hdf5 \
     +kokkos \
+    ^legion network=gasnet conduit=mpi +hdf5 +kokkos \
     ^openmpi \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
@@ -122,7 +128,7 @@ RUN \
     +graphviz \
     +hdf5 \
     +kokkos \
-    ^legion build_type=Debug \
+    ^legion build_type=Debug network=gasnet conduit=mpi +hdf5 +kokkos \
     ^openmpi
 
 #------------------------------------------------------------------------------#

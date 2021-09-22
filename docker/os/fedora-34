@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------#
-# FleCSI CI Configuration for CentOS 8
+# FleCSI CI Configuration for Fedora 32
 #------------------------------------------------------------------------------#
 
-FROM centos:8
+FROM fedora:34
 
 #------------------------------------------------------------------------------#
 # Image arguments.
@@ -13,14 +13,6 @@ ARG SPACK_BRANCH
 ARG SPACK_HASH
 
 #------------------------------------------------------------------------------#
-# Install and configure Extra Packages for Enterprise Linux
-#------------------------------------------------------------------------------#
-
-RUN dnf install -y epel-release 'dnf-command(config-manager)'
-
-RUN dnf config-manager --set-enabled powertools
-
-#------------------------------------------------------------------------------#
 # Install basic linux requirements
 #------------------------------------------------------------------------------#
 
@@ -28,20 +20,29 @@ RUN dnf update -y && dnf install -y \
   ccache \
   clang \
   cmake \
+  curl \
   doxygen \
+  emacs-color-theme \
+  file \
+  findutils \
   flex \
-  gcc-toolset-9 \
+  gcc \
+  gcc-c++ \
+  gcc-gfortran \
   git \
+  graphviz-devel \
   lbzip2 \
   make \
   passwd \
   patch \
   python3 \
+  python3-pip \
   rsync \
-  sudo \
   vim-enhanced \
   wget \
-  which
+  which \
+  unzip \
+  xz
 
 #------------------------------------------------------------------------------#
 # Add flecsi user
