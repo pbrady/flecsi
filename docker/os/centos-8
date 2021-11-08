@@ -59,6 +59,13 @@ ADD --chown=flecsi:flecsi dircolors ./.dircolors
 ADD --chown=flecsi:flecsi vimrc ./.vimrc
 
 #------------------------------------------------------------------------------#
+# Setup gcc 9
+#------------------------------------------------------------------------------#
+
+ENV PATH /opt/rh/gcc-toolset-9/root/usr/bin:$PATH
+RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
+
+#------------------------------------------------------------------------------#
 # Install pip packages
 #------------------------------------------------------------------------------#
 

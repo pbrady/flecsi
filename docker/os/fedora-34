@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-# FleCSI CI Configuration for Fedora 32
+# FleCSI CI Configuration for Fedora 34
 #------------------------------------------------------------------------------#
 
 FROM fedora:34
@@ -58,6 +58,12 @@ WORKDIR /home/flecsi
 ADD --chown=flecsi:flecsi bashrc ./.bashrc
 ADD --chown=flecsi:flecsi dircolors ./.dircolors
 ADD --chown=flecsi:flecsi vimrc ./.vimrc
+
+#------------------------------------------------------------------------------#
+# Capture version information
+#------------------------------------------------------------------------------#
+
+RUN gcc -v 2>&1 | grep "gcc version" | awk '{ print $3 }' > .gnu_version
 
 #------------------------------------------------------------------------------#
 # Install pip packages
