@@ -85,7 +85,7 @@ RUN \
     +graphviz \
     +hdf5 \
     +kokkos \
-    ^legion network=gasnet conduit=mpi +hdf5 +kokkos \
+    ^legion network=gasnet conduit=ucx +hdf5 +kokkos \
     ^mpich \
   && \
   spack install --fail-fast --show-log-on-error --only dependencies \
@@ -94,58 +94,37 @@ RUN \
     +graphviz \
     +hdf5 \
     +kokkos \
-    ^legion build_type=Debug network=gasnet conduit=mpi +hdf5 +kokkos \
+    ^legion build_type=Debug network=gasnet conduit=ucx +hdf5 +kokkos \
     ^mpich
 
 #------------------------------------------------------------------------------#
-# Build flecsi dependencies with openmpi provider.
+# Create spack environment
 #------------------------------------------------------------------------------#
-
-RUN echo -e "${EMPH}Building openmpi dependencies for flecsi@${SOURCE_VERSION}${NEMPH}"
 
 RUN \
-  . .spack-upstream/share/spack/setup-env.sh \
+  . .spack/share/spack/setup-env.sh \
   && \
-  spack fetch --dependencies \
-    flecsi@${SOURCE_VERSION} backend=legion caliper_detail=low \
-    +graphviz \
-    +hdf5 \
-    +kokkos \
-    ^openmpi \
+  spack env create dev-ucx \
   && \
-  spack install --fail-fast --show-log-on-error --only dependencies \
+  spack env activate dev-ucx \
+  && \
+  spack install --only dependencies \
     flecsi@${SOURCE_VERSION} \
     backend=legion caliper_detail=low \
     +graphviz \
     +hdf5 \
     +kokkos \
-    ^legion network=gasnet conduit=mpi +hdf5 +kokkos \
-    ^openmpi \
+    ^legion network=gasnet conduit=ucx +hdf5 +kokkos \
+    ^mpich \
   && \
-  spack install --fail-fast --show-log-on-error --only dependencies \
+  spack install --only dependencies \
     flecsi@${SOURCE_VERSION} \
     backend=legion caliper_detail=low \
     +graphviz \
     +hdf5 \
     +kokkos \
-    ^legion build_type=Debug network=gasnet conduit=mpi +hdf5 +kokkos \
-    ^openmpi
-
-#------------------------------------------------------------------------------#
-# Create format environment.
-#------------------------------------------------------------------------------#
-
-RUN . .spack-upstream/share/spack/setup-env.sh && \
-  spack env create format && \
-  spack env activate format && \
-  spack install cmake
-
-#------------------------------------------------------------------------------#
-# Remove the flecsi repository so that the MR can override our defaults.
-#------------------------------------------------------------------------------#
-
-RUN . .spack/share/spack/setup-env.sh && \
-  spack repo remove flecsi
+    ^legion build_type=Debug network=gasnet conduit=ucx +hdf5 +kokkos \
+    ^mpich
 
 #------------------------------------------------------------------------------#
 # Set default shell for interactive.

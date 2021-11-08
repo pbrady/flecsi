@@ -30,14 +30,14 @@ set(SPACK_REPOSITORY "https://github.com/spack/spack.git" CACHE STRING
 set(SPACK_BRANCH "develop" CACHE STRING "Set the Spack branch")
 set(SPACK_HASH "HEAD" CACHE STRING "Set the Spack hash")
 
-set(TARGET_BRANCH "devel" CACHE STRING
+set(TARGET_BRANCH "develop" CACHE STRING
   "Set the target branch (branch subdir used for configuration)")
 
 set(SOURCE_REPOSITORY "https://gitlab.lanl.gov/flecsi/flecsi.git" CACHE STRING
   "Set the FleCSI source repository")
-set(SOURCE_BRANCH "devel" CACHE STRING
+set(SOURCE_BRANCH "develop" CACHE STRING
   "Set the source repository branch")
-set(SOURCE_VERSION "devel" CACHE STRING
+set(SOURCE_VERSION "develop" CACHE STRING
   "Set the source repository version")
 
 set(REGISTRY "gitlab.lanl.gov:5050/flecsi/flecsi" CACHE STRING
@@ -72,6 +72,20 @@ foreach(image ${BASE_IMAGES})
   add_image(${TARGET_BRANCH}-${image}
     ${REGISTRY}:${TARGET_BRANCH}-${image}
     docker/targets/ci
+    TARGET_BRANCH
+      ${TARGET_BRANCH}
+    ARGS
+      SOURCE_REPO=${SOURCE_REPOSITORY}
+      SOURCE_BRANCH=${SOURCE_BRANCH}
+      SOURCE_VERSION=${SOURCE_VERSION}
+      OS=${REGISTRY}:${image}
+    DEPENDS
+      push-${image}
+  )
+
+  add_image(${TARGET_BRANCH}-${image}-ucx
+    ${REGISTRY}:${TARGET_BRANCH}-${image}
+    docker/targets/ucx
     TARGET_BRANCH
       ${TARGET_BRANCH}
     ARGS
@@ -119,18 +133,6 @@ add_image(tutorial
     OS=${REGISTRY}:2.0-clearlinux
   DEPENDS
     push-2.0-clearlinux
-)
-
-#------------------------------------------------------------------------------#
-# Legion unit test image
-#------------------------------------------------------------------------------#
-
-add_image(legion-unit ${REGISTRY}:legion-unit
-  devel/legion-unit
-  ARGS
-    OS=${REGISTRY}:devel-ubuntu-20.04
-  DEPENDS
-    push-devel-ubuntu-20.04
 )
 
 #------------------------------------------------------------------------------#
